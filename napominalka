@@ -4,7 +4,9 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="theme-color" content="#4CAF50">
-    <title>Заботливый День — Помощник</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Напоминалка — Помощник</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,9 +20,10 @@
             --text: #212121;
             --text-light: #757575;
             --border: #E0E0E0;
-            --radius: 20px;
+            --radius: 16px;
             --shadow: 0 4px 15px rgba(0,0,0,0.08);
-            --nav-height: 80px;
+            --nav-height: 70px;
+            --touch-target: 56px;
         }
 
         [data-theme="dark"] {
@@ -33,7 +36,13 @@
             --border: #333333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
 
         body {
             font-family: 'Roboto', sans-serif;
@@ -43,11 +52,14 @@
             padding-bottom: calc(var(--nav-height) + 20px);
             transition: background 0.3s;
             overflow-x: hidden;
+            font-size: 16px;
+            line-height: 1.5;
         }
 
+        /* Оптимизированный хедер */
         .header {
             background: var(--card);
-            padding: 20px 20px 15px;
+            padding: 16px;
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
@@ -58,191 +70,536 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
 
         .logo-icon {
-            width: 48px; height: 48px;
+            width: 44px; 
+            height: 44px;
             background: linear-gradient(135deg, var(--primary), #81C784);
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
+            border-radius: 12px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 24px;
             box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
         }
 
-        .logo-text h1 { font-size: 22px; font-weight: 900; color: var(--text); line-height: 1; }
-        .logo-text span { font-size: 12px; color: var(--text-light); font-weight: 500; }
-
-        .greeting {
-            font-size: 14px; color: var(--primary); font-weight: 700;
-            background: var(--primary-light); padding: 6px 12px; border-radius: 20px;
+        .logo-text h1 { 
+            font-size: 18px; 
+            font-weight: 900; 
+            color: var(--text); 
+            line-height: 1.2;
+        }
+        .logo-text span { 
+            font-size: 11px; 
+            color: var(--text-light); 
+            font-weight: 500; 
         }
 
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .greeting {
+            font-size: 13px; 
+            color: var(--primary); 
+            font-weight: 700;
+            background: var(--primary-light); 
+            padding: 6px 10px; 
+            border-radius: 16px;
+            white-space: nowrap;
+        }
 
+        .container { 
+            padding: 12px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+
+        /* Карточки */
         .card {
-            background: var(--card); border-radius: var(--radius); padding: 20px;
-            margin-bottom: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);
+            background: var(--card); 
+            border-radius: var(--radius); 
+            padding: 16px;
+            margin-bottom: 12px; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border);
             transition: transform 0.2s;
         }
         .card:active { transform: scale(0.98); }
 
-        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .card-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+        }
         .card-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            width: 40px; 
+            height: 40px; 
+            border-radius: 10px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 22px;
         }
         .icon-green { background: var(--primary-light); color: var(--primary); }
         .icon-blue { background: #E3F2FD; color: var(--secondary); }
         .icon-orange { background: #FFF3E0; color: var(--accent); }
 
-        .card-title { font-size: 18px; font-weight: 800; }
+        .card-title { 
+            font-size: 17px; 
+            font-weight: 800; 
+        }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        /* Статистика */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-bottom: 16px; 
+        }
         .stat-card {
-            background: var(--card); padding: 20px; border-radius: var(--radius);
-            text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border);
+            background: var(--card); 
+            padding: 16px; 
+            border-radius: var(--radius);
+            text-align: center; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .stat-value { font-size: 32px; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 5px; }
-        .stat-label { font-size: 14px; color: var(--text-light); font-weight: 500; }
+        .stat-value { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: var(--primary); 
+            line-height: 1; 
+            margin-bottom: 4px; 
+        }
+        .stat-label { 
+            font-size: 13px; 
+            color: var(--text-light); 
+            font-weight: 500; 
+        }
 
+        /* Кнопки - оптимизированы для тача */
         .btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; padding: 16px; border: none; border-radius: 16px;
-            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px;
+            width: 100%; 
+            padding: 16px; 
+            min-height: var(--touch-target);
+            border: none; 
+            border-radius: 12px;
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.2s;
             font-family: inherit;
+            -webkit-appearance: none;
         }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); }
-        .btn-secondary { background: var(--secondary); color: white; box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-danger { background: #EF5350; color: white; }
+        .btn:active { 
+            transform: scale(0.96); 
+            opacity: 0.9;
+        }
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); 
+        }
+        .btn-secondary { 
+            background: var(--secondary); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); 
+        }
+        .btn-outline { 
+            background: transparent; 
+            border: 2px solid var(--primary); 
+            color: var(--primary); 
+        }
+        .btn-danger { 
+            background: #EF5350; 
+            color: white; 
+        }
+        .btn-large {
+            padding: 18px;
+            font-size: 17px;
+        }
 
+        /* Поля ввода - крупные для удобства */
         input, select {
-            width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 14px;
-            font-size: 18px; background: var(--bg); color: var(--text); margin-bottom: 12px;
-            outline: none; font-family: inherit;
+            width: 100%; 
+            padding: 16px; 
+            min-height: 52px;
+            border: 2px solid var(--border); 
+            border-radius: 12px;
+            font-size: 18px; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin-bottom: 12px;
+            outline: none; 
+            font-family: inherit;
+            -webkit-appearance: none;
         }
-        input:focus { border-color: var(--primary); }
+        input:focus, select:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
 
+        /* Список таблеток - оптимизирован */
         .pill-item {
-            display: flex; align-items: center; padding: 15px; background: var(--bg);
-            border-radius: 16px; margin-bottom: 10px; border: 1px solid var(--border); gap: 15px;
+            display: flex; 
+            align-items: center; 
+            padding: 14px; 
+            background: var(--bg);
+            border-radius: 12px; 
+            margin-bottom: 10px; 
+            border: 1px solid var(--border); 
+            gap: 12px;
+            min-height: 72px;
         }
-        .pill-item.taken { opacity: 0.6; background: var(--primary-light); }
-        .pill-item.taken .pill-info span { text-decoration: line-through; }
-        .pill-time { font-size: 20px; font-weight: 800; color: var(--secondary); min-width: 60px; text-align: center; }
-        .pill-info { flex: 1; }
-        .pill-name { font-size: 16px; font-weight: 700; display: block; }
-        .pill-dose { font-size: 14px; color: var(--text-light); }
+        .pill-item.taken { 
+            opacity: 0.6; 
+            background: var(--primary-light); 
+        }
+        .pill-item.taken .pill-info span { 
+            text-decoration: line-through; 
+        }
+        .pill-time { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            min-width: 56px; 
+            text-align: center; 
+        }
+        .pill-info { 
+            flex: 1; 
+            min-width: 0;
+        }
+        .pill-name { 
+            font-size: 16px; 
+            font-weight: 700; 
+            display: block; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .pill-dose { 
+            font-size: 14px; 
+            color: var(--text-light); 
+        }
         .pill-btn {
-            width: 48px; height: 48px; border-radius: 50%; border: none;
-            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 24px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            border: none;
+            background: white; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            font-size: 24px;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            flex-shrink: 0;
         }
-        .pill-btn:active { transform: scale(0.9); }
-        .pill-btn.done { background: var(--primary); color: white; }
+        .pill-btn:active { 
+            transform: scale(0.9); 
+        }
+        .pill-btn.done { 
+            background: var(--primary); 
+            color: white; 
+        }
 
-        .water-visual { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+        /* Вода */
+        .water-visual { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 20px 0; 
+        }
         .cup-container {
-            width: 120px; height: 160px; border: 4px solid var(--secondary);
-            border-top: none; border-radius: 0 0 20px 20px; position: relative;
-            overflow: hidden; background: rgba(21, 101, 192, 0.1);
+            width: 100px; 
+            height: 140px; 
+            border: 4px solid var(--secondary);
+            border-top: none; 
+            border-radius: 0 0 16px 16px; 
+            position: relative;
+            overflow: hidden; 
+            background: rgba(21, 101, 192, 0.1);
         }
         .water-fill {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to top, #1565C0, #42A5F5); transition: height 0.5s ease;
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 0%;
+            background: linear-gradient(to top, #1565C0, #42A5F5); 
+            transition: height 0.5s ease;
         }
         .water-fill::after {
-            content: ''; position: absolute; top: -5px; left: 0; width: 100%; height: 10px;
-            background: rgba(255,255,255,0.3); border-radius: 50%; animation: wave 2s infinite linear;
+            content: ''; 
+            position: absolute; 
+            top: -5px; 
+            left: 0; 
+            width: 100%; 
+            height: 10px;
+            background: rgba(255,255,255,0.3); 
+            border-radius: 50%; 
+            animation: wave 2s infinite linear;
         }
-        @keyframes wave { 0% { transform: scaleX(1); } 50% { transform: scaleX(1.1); } 100% { transform: scaleX(1); } }
-        .water-info { margin-top: 15px; text-align: center; }
-        .water-count { font-size: 36px; font-weight: 900; color: var(--secondary); }
-        .water-goal { font-size: 16px; color: var(--text-light); }
+        @keyframes wave { 
+            0% { transform: scaleX(1); } 
+            50% { transform: scaleX(1.1); } 
+            100% { transform: scaleX(1); } 
+        }
+        .water-info { 
+            margin-top: 12px; 
+            text-align: center; 
+        }
+        .water-count { 
+            font-size: 32px; 
+            font-weight: 900; 
+            color: var(--secondary); 
+        }
+        .water-goal { 
+            font-size: 15px; 
+            color: var(--text-light); 
+        }
 
+        /* Советы */
         .tip-card {
-            background: linear-gradient(135deg, #FFF8E1, #FFFFFF); border: 1px solid #FFE082;
-            border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; gap: 12px; align-items: flex-start;
+            background: linear-gradient(135deg, #FFF8E1, #FFFFFF); 
+            border: 1px solid #FFE082;
+            border-radius: 12px; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            gap: 12px; 
+            align-items: flex-start;
         }
-        .tip-icon { font-size: 28px; }
-        .tip-text { font-size: 15px; line-height: 1.4; color: #4E342E; }
+        .tip-icon { 
+            font-size: 26px; 
+            flex-shrink: 0;
+        }
+        .tip-text { 
+            font-size: 15px; 
+            line-height: 1.5; 
+            color: #4E342E; 
+        }
 
-        /* Справочник стили */
+        /* Справочник */
         .disclaimer-box {
-            background: #FFF3E0; border-left: 5px solid var(--accent);
-            padding: 15px; border-radius: 12px; margin-bottom: 20px;
-            font-size: 14px; color: #E65100; line-height: 1.5;
+            background: #FFF3E0; 
+            border-left: 5px solid var(--accent);
+            padding: 14px; 
+            border-radius: 12px; 
+            margin-bottom: 16px;
+            font-size: 14px; 
+            color: #E65100; 
+            line-height: 1.5;
         }
         .search-box {
-            position: relative; margin-bottom: 20px;
+            position: relative; 
+            margin-bottom: 16px;
         }
         .search-box input {
-            margin: 0; padding-left: 45px; font-size: 18px;
+            margin: 0; 
+            padding-left: 48px; 
+            font-size: 17px;
+            min-height: 52px;
         }
         .search-box::before {
-            content: '🔍'; position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            font-size: 20px; opacity: 0.6;
+            content: '🔍'; 
+            position: absolute; 
+            left: 16px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            font-size: 20px; 
+            opacity: 0.6;
         }
         .category-title {
-            font-size: 20px; font-weight: 800; color: var(--text);
-            margin: 20px 0 10px; padding-left: 5px; border-left: 4px solid var(--secondary);
-            padding-left: 12px;
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--text);
+            margin: 16px 0 10px; 
+            padding-left: 12px; 
+            border-left: 4px solid var(--secondary);
         }
         .disease-card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-            padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 12px;
+            padding: 14px; 
+            margin-bottom: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .disease-name { font-size: 18px; font-weight: 800; color: var(--secondary); margin-bottom: 6px; }
-        .disease-meds { font-size: 16px; color: var(--text); margin-bottom: 8px; font-weight: 500; }
+        .disease-name { 
+            font-size: 17px; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin-bottom: 6px; 
+        }
+        .disease-meds { 
+            font-size: 15px; 
+            color: var(--text); 
+            margin-bottom: 8px; 
+            font-weight: 500; 
+        }
         .disease-note {
-            font-size: 14px; color: var(--text-light); background: var(--primary-light);
-            padding: 10px; border-radius: 10px; border-left: 3px solid var(--primary);
+            font-size: 14px; 
+            color: var(--text-light); 
+            background: var(--primary-light);
+            padding: 10px; 
+            border-radius: 8px; 
+            border-left: 3px solid var(--primary);
+            line-height: 1.4;
         }
 
+        /* Нижняя навигация - оптимизирована */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
-            height: var(--nav-height); display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--border); box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: var(--card);
+            height: var(--nav-height); 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr);
+            border-top: 1px solid var(--border); 
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 100; 
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            padding-top: 4px;
         }
         .nav-btn {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 4px; border: none; background: none; color: var(--text-light);
-            font-size: 10px; font-weight: 600; cursor: pointer; transition: color 0.2s;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            gap: 2px; 
+            border: none; 
+            background: none; 
+            color: var(--text-light);
+            font-size: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: color 0.2s;
+            padding: 4px;
+            min-height: var(--nav-height);
         }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn span { font-size: 24px; margin-bottom: 2px; }
+        .nav-btn.active { 
+            color: var(--primary); 
+        }
+        .nav-btn span { 
+            font-size: 22px; 
+            margin-bottom: 2px; 
+        }
 
-        .page { display: none; animation: fadeIn 0.3s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Страницы */
+        .page { 
+            display: none; 
+            animation: fadeIn 0.3s; 
+        }
+        .page.active { 
+            display: block; 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
+        /* Модальное окно - на весь экран для мобильных */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
-            display: none; align-items: flex-end; justify-content: center;
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 1000;
+            display: none; 
+            align-items: flex-end; 
+            justify-content: center;
         }
-        .modal-overlay.open { display: flex; }
+        .modal-overlay.open { 
+            display: flex; 
+        }
         .modal-content {
-            background: var(--card); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0;
-            padding: 24px; animation: slideUp 0.3s;
+            background: var(--card); 
+            width: 100%; 
+            max-width: 600px; 
+            border-radius: 20px 20px 0 0;
+            padding: 20px; 
+            animation: slideUp 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 22px; font-weight: 800; }
+        @keyframes slideUp { 
+            from { transform: translateY(100%); } 
+            to { transform: translateY(0); } 
+        }
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        .modal-title { 
+            font-size: 20px; 
+            font-weight: 800; 
+        }
         .close-modal {
-            width: 36px; height: 36px; border-radius: 50%; border: none;
-            background: var(--bg); font-size: 20px; cursor: pointer;
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            border: none;
+            background: var(--bg); 
+            font-size: 24px; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Адаптация для больших экранов */
         @media (min-width: 600px) {
-            .modal-content { border-radius: 24px; margin: auto; }
-            .modal-overlay { align-items: center; padding: 20px; }
-            .bottom-nav { grid-template-columns: repeat(5, 1fr); }
+            .modal-content { 
+                border-radius: 20px; 
+                margin: auto; 
+            }
+            .modal-overlay { 
+                align-items: center; 
+                padding: 20px; 
+            }
+            .bottom-nav { 
+                grid-template-columns: repeat(5, 1fr); 
+            }
         }
-        @media (max-width: 380px) {
+
+        /* Маленькие экраны */
+        @media (max-width: 360px) {
+            .logo-text h1 { font-size: 16px; }
+            .stat-value { font-size: 24px; }
             .nav-btn span { font-size: 20px; }
             .nav-btn { font-size: 9px; }
+            .pill-time { font-size: 16px; min-width: 50px; }
+        }
+
+        /* Утилиты */
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mt-4 { margin-top: 16px; }
+        .text-light { color: var(--text-light); }
+        .font-bold { font-weight: 700; }
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
         }
     </style>
 </head>
@@ -289,7 +646,7 @@
                     <div class="card-icon icon-green">🌟</div>
                     <div class="card-title">Совет дня</div>
                 </div>
-                <div id="dailyTip" style="font-size:16px; line-height:1.5; color:var(--text);">Загрузка...</div>
+                <div id="dailyTip" style="font-size:16px; line-height:1.6; color:var(--text);">Загрузка...</div>
             </div>
         </div>
 
@@ -300,9 +657,11 @@
                     <div class="card-icon icon-green">💊</div>
                     <div class="card-title">Мои лекарства</div>
                 </div>
-                <p style="color:var(--text-light); margin-bottom:15px;">Нажмите на кружок, когда выпили таблетку.</p>
+                <p style="color:var(--text-light); margin-bottom:16px; font-size:15px;">Нажмите на кружок, когда выпили таблетку.</p>
                 <div id="pillsList"></div>
-                <button class="btn btn-primary" onclick="openPillModal()" style="margin-top:10px;">+ Добавить лекарство</button>
+                <button class="btn btn-primary btn-large mt-3" onclick="openPillModal()">
+                    <span style="font-size:20px;">+</span> Добавить лекарство
+                </button>
             </div>
         </div>
 
@@ -320,25 +679,27 @@
                         <div class="water-goal">Стаканов (200 мл)</div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <button class="btn btn-secondary" onclick="addWater()">+ 1 Стакан</button>
-                    <button class="btn btn-outline" onclick="resetWater()">Сбросить</button>
+                <div class="grid-2">
+                    <button class="btn btn-secondary btn-large" onclick="addWater()">
+                        <span style="font-size:20px;">+</span> Стакан
+                    </button>
+                    <button class="btn btn-outline btn-large" onclick="resetWater()">Сбросить</button>
                 </div>
-                <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border);">
+                <div class="mt-4" style="padding-top:16px; border-top:1px solid var(--border);">
                     <div style="font-size:16px; font-weight:700; margin-bottom:10px;">💡 Когда лучше пить:</div>
-                    <ul style="padding-left:20px; color:var(--text-light); font-size:14px; line-height:1.6;">
-                        <li>Утром натощак — запускает организм.</li>
-                        <li>За 30 мин до еды — улучшает пищеварение.</li>
-                        <li>Между приемами пищи — поддерживает баланс.</li>
+                    <ul style="padding-left:20px; color:var(--text-light); font-size:14px; line-height:1.8;">
+                        <li>Утром натощак — запускает организм</li>
+                        <li>За 30 мин до еды — улучшает пищеварение</li>
+                        <li>Между приемами пищи — поддерживает баланс</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- REFERENCE (NEW) -->
+        <!-- REFERENCE -->
         <div id="referencePage" class="page">
             <div class="disclaimer-box">
-                ⚠️ <strong>Важно:</strong> Этот справочник носит информационный характер. Не занимайтесь самолечением. Дозировки и препараты должен подбирать только ваш лечащий врач с учётом анализов и противопоказаний.
+                ⚠️ <strong>Важно:</strong> Этот справочник носит информационный характер. Не занимайтесь самолечением. Дозировки и препараты должен подбирать только ваш лечащий врач.
             </div>
 
             <div class="search-box">
@@ -347,22 +708,22 @@
 
             <div id="diseaseList"></div>
 
-            <div class="card" style="margin-top:20px;">
+            <div class="card mt-4">
                 <div class="card-header">
                     <div class="card-icon icon-orange">📞</div>
                     <div class="card-title">Экстренная помощь</div>
                 </div>
-                <p style="font-size:16px; line-height:1.5; color:var(--text);">
+                <p style="font-size:16px; line-height:1.8; color:var(--text);">
                     🚑 <strong>Скорая помощь:</strong> 103 или 112<br>
-                    🏥 <strong>Поликлиника:</strong> запишитесь через регистратуру или Госуслуги<br>
-                    💊 <strong>Аптека:</strong> уточняйте наличие и аналоги у фармацевта
+                    🏥 <strong>Поликлиника:</strong> запишитесь через регистратуру<br>
+                    💊 <strong>Аптека:</strong> уточняйте наличие у фармацевта
                 </p>
             </div>
         </div>
 
         <!-- TIPS -->
         <div id="tipsPage" class="page">
-            <div class="card-header" style="margin-bottom:20px;">
+            <div class="card-header mb-4">
                 <div class="card-icon icon-orange">🌿</div>
                 <div class="card-title">Полезные советы</div>
             </div>
@@ -375,7 +736,7 @@
                 <div class="tip-text"><strong>Питание:</strong> Больше овощей и клетчатки. Меньше соли и сахара. Ешьте 5 раз в день небольшими порциями.</div>
             </div>
             <div class="tip-card">
-                <div class="tip-icon">🚶‍♂️</div>
+                <div class="tip-icon">🚶‍️</div>
                 <div class="tip-text"><strong>Движение:</strong> Прогулка 30-40 минут полезна для сердца. Делайте лёгкую разминку по утрам.</div>
             </div>
             <div class="tip-card">
@@ -388,11 +749,21 @@
 
     <!-- NAV -->
     <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('home', this)"><span>🏠</span>Главная</button>
-        <button class="nav-btn" onclick="switchTab('pills', this)"><span>💊</span>Таблетки</button>
-        <button class="nav-btn" onclick="switchTab('water', this)"><span>💧</span>Вода</button>
-        <button class="nav-btn" onclick="switchTab('reference', this)"><span>📖</span>Справочник</button>
-        <button class="nav-btn" onclick="switchTab('tips', this)"><span>🌿</span>Советы</button>
+        <button class="nav-btn active" onclick="switchTab('home', this)">
+            <span>🏠</span>Главная
+        </button>
+        <button class="nav-btn" onclick="switchTab('pills', this)">
+            <span>💊</span>Таблетки
+        </button>
+        <button class="nav-btn" onclick="switchTab('water', this)">
+            <span>💧</span>Вода
+        </button>
+        <button class="nav-btn" onclick="switchTab('reference', this)">
+            <span>📖</span>Справочник
+        </button>
+        <button class="nav-btn" onclick="switchTab('tips', this)">
+            <span>🌿</span>Советы
+        </button>
     </nav>
 
     <!-- MODAL -->
@@ -404,10 +775,10 @@
             </div>
             <input type="text" id="pillNameInput" placeholder="Название (напр. Эналаприл)">
             <input type="text" id="pillDoseInput" placeholder="Дозировка (напр. 1 таблетка)">
-            <label style="font-weight:700; margin-bottom:8px; display:block;">Время приема:</label>
-            <input type="time" id="pillTimeInput">
-            <button class="btn btn-primary" onclick="savePill()">💾 Сохранить</button>
-            <button class="btn btn-outline" onclick="closePillModal()" style="margin-top:10px;">Отмена</button>
+            <label style="font-weight:700; margin-bottom:8px; display:block; font-size:16px;">Время приема:</label>
+            <input type="time" id="pillTimeInput" style="font-size:20px;">
+            <button class="btn btn-primary btn-large mt-3" onclick="savePill()">💾 Сохранить</button>
+            <button class="btn btn-outline btn-large mt-2" onclick="closePillModal()">Отмена</button>
         </div>
     </div>
 
@@ -487,6 +858,9 @@
             document.getElementById(tabId + 'Page').classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            
+            // Вибрация при переключении (если поддерживается)
+            if (navigator.vibrate) navigator.vibrate(10);
         }
 
         function updateGreeting() {
@@ -504,24 +878,39 @@
             document.getElementById('pillDoseInput').value = '';
             const now = new Date();
             document.getElementById('pillTimeInput').value = now.toTimeString().substring(0, 5);
+            if (navigator.vibrate) navigator.vibrate(20);
         }
 
-        function closePillModal() { document.getElementById('pillModal').classList.remove('open'); }
+        function closePillModal() { 
+            document.getElementById('pillModal').classList.remove('open'); 
+        }
 
         function savePill() {
             const name = document.getElementById('pillNameInput').value.trim();
             const dose = document.getElementById('pillDoseInput').value.trim();
             const time = document.getElementById('pillTimeInput').value;
-            if (!name || !time) { alert('Заполните название и время'); return; }
+            if (!name || !time) { 
+                alert('Заполните название и время'); 
+                return; 
+            }
             pills.push({ id: Date.now(), name, dose: dose || '1 шт', time, taken: false });
             pills.sort((a, b) => a.time.localeCompare(b.time));
             localStorage.setItem('z_pills', JSON.stringify(pills));
-            renderPills(); updateStats(); closePillModal();
+            renderPills(); 
+            updateStats(); 
+            closePillModal();
+            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
         }
 
         function togglePill(id) {
             const pill = pills.find(p => p.id === id);
-            if (pill) { pill.taken = !pill.taken; localStorage.setItem('z_pills', JSON.stringify(pills)); renderPills(); updateStats(); }
+            if (pill) { 
+                pill.taken = !pill.taken; 
+                localStorage.setItem('z_pills', JSON.stringify(pills)); 
+                renderPills(); 
+                updateStats();
+                if (navigator.vibrate) navigator.vibrate(pill.taken ? [50] : [20]);
+            }
         }
 
         function deletePill(id, event) {
@@ -529,14 +918,18 @@
             if(confirm('Удалить лекарство?')) {
                 pills = pills.filter(p => p.id !== id);
                 localStorage.setItem('z_pills', JSON.stringify(pills));
-                renderPills(); updateStats();
+                renderPills(); 
+                updateStats();
             }
         }
 
         function renderPills() {
             const list = document.getElementById('pillsList');
             list.innerHTML = '';
-            if (pills.length === 0) { list.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-light)">Список пуст. Добавьте лекарство.</div>'; return; }
+            if (pills.length === 0) { 
+                list.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-light); font-size:16px;">Список пуст.<br>Добавьте лекарство.</div>'; 
+                return; 
+            }
             pills.forEach(pill => {
                 const el = document.createElement('div');
                 el.className = `pill-item ${pill.taken ? 'taken' : ''}`;
@@ -546,7 +939,7 @@
                         <span class="pill-name">${pill.name}</span>
                         <span class="pill-dose">${pill.dose}</span>
                     </div>
-                    <button class="pill-btn ${pill.taken ? 'done' : ''}" onclick="togglePill(${pill.id})">${pill.taken ? '✓' : '💊'}</button>
+                    <button class="pill-btn ${pill.taken ? 'done' : ''}" onclick="togglePill(${pill.id})" aria-label="${pill.taken ? 'Отменить' : 'Отметить'}">${pill.taken ? '✓' : '💊'}</button>
                 `;
                 list.appendChild(el);
             });
@@ -564,6 +957,7 @@
             const nextEl = document.getElementById('nextPillTime');
             nextEl.textContent = nextPill ? `${nextPill.time} — ${nextPill.name}` : 'На сегодня всё принято!';
             nextEl.style.color = nextPill ? 'var(--accent)' : 'var(--primary)';
+            nextEl.style.fontWeight = nextPill ? '700' : '500';
         }
 
         function renderWater() {
@@ -577,15 +971,21 @@
         function addWater() {
             waterData.count++;
             localStorage.setItem('z_water', JSON.stringify(waterData));
-            renderWater(); updateStats();
-            if (waterData.count === 8) alert('Дневная норма воды выполнена! 💧');
+            renderWater(); 
+            updateStats();
+            if (navigator.vibrate) navigator.vibrate(30);
+            if (waterData.count === 8) {
+                alert('Дневная норма воды выполнена! 💧');
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            }
         }
 
         function resetWater() {
             if(confirm('Сбросить счётчик?')) {
                 waterData.count = 0;
                 localStorage.setItem('z_water', JSON.stringify(waterData));
-                renderWater(); updateStats();
+                renderWater(); 
+                updateStats();
             }
         }
 
@@ -621,7 +1021,7 @@
             });
             
             if (list.innerHTML === '') {
-                list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-light)">Ничего не найдено. Попробуйте другой запрос.</div>';
+                list.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-light); font-size:16px;">Ничего не найдено.<br>Попробуйте другой запрос.</div>';
             }
         }
 
@@ -637,7 +1037,10 @@
             "Прогулка перед сном поможет уснуть крепче.",
             "Ешьте медленно и тщательно пережевывайте пищу.",
             "Слушайте любимую музыку — это поднимает настроение!",
-            "Держите ноги в тепле, это важно для иммунитета."
+            "Держите ноги в тепле, это важно для иммунитета.",
+            "Принимайте лекарства строго по назначению врача.",
+            "Контролируйте артериальное давление регулярно.",
+            "Больше двигайтесь — движение это жизнь!"
         ];
 
         function showRandomTip() {
@@ -662,8 +1065,54 @@
         }
 
         function sendNotification(title, body) {
-            if (Notification.permission === 'granted') new Notification(title, { body });
+            if (Notification.permission === 'granted') {
+                new Notification(title, { 
+                    body,
+                    icon: '🏥',
+                    tag: 'health-reminder'
+                });
+            }
         }
+
+        // Обработка свайпов для навигации (опционально)
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                const navBtns = document.querySelectorAll('.nav-btn');
+                const activeBtn = document.querySelector('.nav-btn.active');
+                const currentIndex = Array.from(navBtns).indexOf(activeBtn);
+                
+                if (diff > 0 && currentIndex < navBtns.length - 1) {
+                    // Свайп влево - следующая вкладка
+                    navBtns[currentIndex + 1].click();
+                } else if (diff < 0 && currentIndex > 0) {
+                    // Свайп вправо - предыдущая вкладка
+                    navBtns[currentIndex - 1].click();
+                }
+            }
+        }
+
+        // Предотвращение случайного закрытия при обновлении страницы
+        window.addEventListener('beforeunload', (e) => {
+            if (pills.some(p => !p.taken)) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
 
         init();
     </script>
