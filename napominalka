@@ -56,7 +56,6 @@
             line-height: 1.5;
         }
 
-        /* Оптимизированный хедер */
         .header {
             background: var(--card);
             padding: 16px;
@@ -116,7 +115,6 @@
             margin: 0 auto; 
         }
 
-        /* Карточки */
         .card {
             background: var(--card); 
             border-radius: var(--radius); 
@@ -152,7 +150,6 @@
             font-weight: 800; 
         }
 
-        /* Статистика */
         .stats-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -184,7 +181,7 @@
             font-weight: 500; 
         }
 
-        /* Кнопки - оптимизированы для тача */
+        /* ✅ ИСПРАВЛЕНО: Добавлены все префиксы appearance */
         .btn {
             display: flex; 
             align-items: center; 
@@ -201,6 +198,8 @@
             transition: all 0.2s;
             font-family: inherit;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
         .btn:active { 
             transform: scale(0.96); 
@@ -230,8 +229,8 @@
             font-size: 17px;
         }
 
-        /* Поля ввода - крупные для удобства */
-        input, select {
+        /* ✅ ИСПРАВЛЕНО: Добавлены все префиксы appearance для инпутов */
+        input, select, textarea {
             width: 100%; 
             padding: 16px; 
             min-height: 52px;
@@ -244,13 +243,14 @@
             outline: none; 
             font-family: inherit;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
-        input:focus, select:focus { 
+        input:focus, select:focus, textarea:focus { 
             border-color: var(--primary); 
             box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
         }
 
-        /* Список таблеток - оптимизирован */
         .pill-item {
             display: flex; 
             align-items: center; 
@@ -314,7 +314,6 @@
             color: white; 
         }
 
-        /* Вода */
         .water-visual { 
             display: flex; 
             flex-direction: column; 
@@ -370,7 +369,6 @@
             color: var(--text-light); 
         }
 
-        /* Советы */
         .tip-card {
             background: linear-gradient(135deg, #FFF8E1, #FFFFFF); 
             border: 1px solid #FFE082;
@@ -391,7 +389,6 @@
             color: #4E342E; 
         }
 
-        /* Справочник */
         .disclaimer-box {
             background: #FFF3E0; 
             border-left: 5px solid var(--accent);
@@ -459,7 +456,6 @@
             line-height: 1.4;
         }
 
-        /* Нижняя навигация - оптимизирована */
         .bottom-nav {
             position: fixed; 
             bottom: 0; 
@@ -499,7 +495,6 @@
             margin-bottom: 2px; 
         }
 
-        /* Страницы */
         .page { 
             display: none; 
             animation: fadeIn 0.3s; 
@@ -512,7 +507,6 @@
             to { opacity: 1; transform: translateY(0); } 
         }
 
-        /* Модальное окно - на весь экран для мобильных */
         .modal-overlay {
             position: fixed; 
             inset: 0; 
@@ -562,7 +556,6 @@
             justify-content: center;
         }
 
-        /* Адаптация для больших экранов */
         @media (min-width: 600px) {
             .modal-content { 
                 border-radius: 20px; 
@@ -577,7 +570,6 @@
             }
         }
 
-        /* Маленькие экраны */
         @media (max-width: 360px) {
             .logo-text h1 { font-size: 16px; }
             .stat-value { font-size: 24px; }
@@ -586,7 +578,6 @@
             .pill-time { font-size: 16px; min-width: 50px; }
         }
 
-        /* Утилиты */
         .text-center { text-align: center; }
         .mb-2 { margin-bottom: 8px; }
         .mb-3 { margin-bottom: 12px; }
@@ -792,7 +783,6 @@
             localStorage.setItem('z_water', JSON.stringify(waterData));
         }
 
-        // Данные справочника
         const diseasesData = [
             {
                 category: "❤️ Сердце и сосуды",
@@ -858,8 +848,6 @@
             document.getElementById(tabId + 'Page').classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
-            // Вибрация при переключении (если поддерживается)
             if (navigator.vibrate) navigator.vibrate(10);
         }
 
@@ -989,7 +977,6 @@
             }
         }
 
-        // Справочник
         function renderDiseases(filter = '') {
             const list = document.getElementById('diseaseList');
             list.innerHTML = '';
@@ -1074,7 +1061,6 @@
             }
         }
 
-        // Обработка свайпов для навигации (опционально)
         let touchStartX = 0;
         let touchEndX = 0;
         
@@ -1097,16 +1083,13 @@
                 const currentIndex = Array.from(navBtns).indexOf(activeBtn);
                 
                 if (diff > 0 && currentIndex < navBtns.length - 1) {
-                    // Свайп влево - следующая вкладка
                     navBtns[currentIndex + 1].click();
                 } else if (diff < 0 && currentIndex > 0) {
-                    // Свайп вправо - предыдущая вкладка
                     navBtns[currentIndex - 1].click();
                 }
             }
         }
 
-        // Предотвращение случайного закрытия при обновлении страницы
         window.addEventListener('beforeunload', (e) => {
             if (pills.some(p => !p.taken)) {
                 e.preventDefault();
